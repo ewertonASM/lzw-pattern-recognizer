@@ -1,0 +1,4 @@
+tqdm>=4.50.2
+fire>=0.4.0
+colr>=0.9.1
+matplotlib>=3.3.2
