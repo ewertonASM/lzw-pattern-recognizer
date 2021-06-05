@@ -1,0 +1,1 @@
+# LZW-pattern-recognizer
