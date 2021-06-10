@@ -6,14 +6,16 @@ import re
 
 encoding = 'latin-1'
 
+
 class LzwCompress():
 
-    def __init__(self, file_dir=str, bits_number=int):
+    def __init__(self, file_dir=None, bits_number=int, dict_cache=None):
 
         self._file_dir = file_dir
         self._table_edge = pow(2, bits_number)
         self.bytes_dictionary_size = 256
-        self._dictionary = {i.to_bytes(1, 'big'):i for i in range(
+        self.dict_cache = dict_cache
+        self._dictionary = dict_cache if dict_cache else {i.to_bytes(1, 'big'): i for i in range(
             self.bytes_dictionary_size)}
 
     def open_file(self):
@@ -22,7 +24,7 @@ class LzwCompress():
             with open(self._file_dir, 'r', encoding='latin-1') as f:
                 data = f.read()
             return data
-            
+
         except:
             print("ERROR: File not found")
 
@@ -33,16 +35,22 @@ class LzwCompress():
 
         with open(output_dir, 'wb') as output:
             for data in compressed_data:
-                 output.write(pack('>H', data))
+                output.write(pack('>H', data))
 
-    def start_compress(self, color):
+    def start_compress(self, color="#F6736C"):
 
         data = self.open_file()
         string = ""
         compressed_data = []
 
         start = time.time()
-        for character in tqdm(data, colour=color):
+
+        progress_bar = False if not color else tqdm(data)
+
+        for character in data:
+
+            if progress_bar:
+                progress_bar.update(1)
 
             symbol = string + character
 
@@ -52,8 +60,9 @@ class LzwCompress():
                 encoded_chr = string.encode(encoding)
                 compressed_data.append(self._dictionary[encoded_chr])
 
-                if(len(self._dictionary) <= self._table_edge):
-                    self._dictionary[symbol.encode(encoding)] = self.bytes_dictionary_size
+                if(len(self._dictionary) <= self._table_edge) and not self.dict_cache:
+                    self._dictionary[symbol.encode(
+                        encoding)] = self.bytes_dictionary_size
                     self.bytes_dictionary_size += 1
 
                 string = character
@@ -64,10 +73,9 @@ class LzwCompress():
         end = time.time()
         compress_time = end - start
 
-        print(f'Elapsed time is {end - start}s')
+        # print(f'Elapsed time is {end - start}s')
 
-        self.write_compress_file(compressed_data)
+        # if self.dict_cache:
+        #     self.write_compress_file(compressed_data)
 
-        return compress_time, len(compressed_data), len(compressed_data)
-
-        
+        return compress_time, len(compressed_data), len(compressed_data), compressed_data
