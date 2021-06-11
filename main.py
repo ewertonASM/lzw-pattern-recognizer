@@ -29,8 +29,8 @@ def compress(bits_number, input_file, painter):
         compressed_sizes.append(compressed_size)
         num_indexes.append(len_compressed_data)
 
-    report_generator(compression_times, num_indexes,
-                     input_file, compressed_sizes, kbit)
+    # report_generator(compression_times, num_indexes,
+    #                  input_file, compressed_sizes, kbit)
 
 
 def decompress(bits_number, input_file, painter):

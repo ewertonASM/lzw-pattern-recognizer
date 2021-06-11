@@ -38,6 +38,11 @@ class PatternRecognizer:
             with open(f'dict_cache/{dict_cache_name}_{self.kbit}', 'wb') as dict_cache:
                 pickle.dump(compress._dictionary, dict_cache)
 
+
+            for test_file in test_data:
+                self.input_file = test_file
+                self.test()
+
     def test(self):
 
         best_compressed_data_len = sys.maxsize
@@ -59,4 +64,4 @@ class PatternRecognizer:
                     best_compression = compressed_data
                     best_compressed_data_len = len(compressed_data)
 
-        compress.write_compress_file(compressed_data)
+        compress.write_compress_file(best_compression)

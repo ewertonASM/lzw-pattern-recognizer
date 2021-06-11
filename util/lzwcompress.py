@@ -57,6 +57,7 @@ class LzwCompress():
             if symbol.encode(encoding) in self._dictionary:
                 string = symbol
             else:
+                # if(string):
                 encoded_chr = string.encode(encoding)
                 compressed_data.append(self._dictionary[encoded_chr])
 
@@ -75,7 +76,7 @@ class LzwCompress():
 
         # print(f'Elapsed time is {end - start}s')
 
-        # if self.dict_cache:
-        #     self.write_compress_file(compressed_data)
+        if not self.dict_cache:
+            self.write_compress_file(compressed_data)
 
         return compress_time, len(compressed_data), len(compressed_data), compressed_data

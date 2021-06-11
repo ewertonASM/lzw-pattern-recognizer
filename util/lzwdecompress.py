@@ -12,7 +12,7 @@ class LzwDecompress():
         self._file_dir = file_dir
         self._table_edge = pow(2, bits_number)
         self._dictionary_size = 256
-        self._dictionary = dict([(x, f'{x}'.enconde(encoding))
+        self._dictionary = dict([(x, x.to_bytes(1, 'big'))
                                  for x in range(self._dictionary_size)])
         self._compressed_data = []
 
@@ -21,8 +21,8 @@ class LzwDecompress():
         with open(self._file_dir, 'rb') as f:
 
             while True:
-                rec = f.read(4)
-                if len(rec) != 4:
+                rec = f.read(2)
+                if len(rec) != 2:
                     break
                 (data, ) = unpack('>H', rec)
                 self._compressed_data.append(data)
