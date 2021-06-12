@@ -60,6 +60,10 @@ def lzw_pattern_recognizer_train(input_file, bits_number, train_split, painter):
         print(log)
 
         pattern_recognizer.train(color, train_split)
+    
+    for file in sorted(pattern_recognizer.test_data):
+        pattern_recognizer.input_file = file
+        pattern_recognizer.test()
 
 
 def lzw_pattern_recognizer_test(input_file, painter):
