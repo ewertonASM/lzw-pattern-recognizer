@@ -1,13 +1,13 @@
 import os
 import re
 import pickle
+from numpy.core.fromnumeric import _transpose_dispatcher
 
 from tqdm import tqdm
 from util import lzwcompress
 import random
 
 import sys
-
 
 class PatternRecognizer:
 
@@ -19,6 +19,8 @@ class PatternRecognizer:
         self.train_dictionary = dict()
         self.kbit = kbit
         self.test_data = []
+        self.trained_data = []
+        self.tested_data = []
 
     def train(self, color, train_split):
 
@@ -31,6 +33,8 @@ class PatternRecognizer:
 
             self.test_data.extend([os.path.join(path, file) for file in tests_files])
             training_data = list(set(files) - set(tests_files))
+            self.trained_data.append(training_data)
+            self.tested_data.append(tests_files)
 
             for file in training_data:
 
