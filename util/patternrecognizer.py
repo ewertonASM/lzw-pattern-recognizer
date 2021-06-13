@@ -4,6 +4,7 @@ import pickle
 
 from tqdm import tqdm
 from util import lzwcompress
+import random
 
 import sys
 
@@ -17,6 +18,7 @@ class PatternRecognizer:
         self.lzwcompress = lzwcompress.LzwCompress
         self.train_dictionary = dict()
         self.kbit = kbit
+        self.test_data = []
 
     def train(self, color, train_split):
 
@@ -24,9 +26,11 @@ class PatternRecognizer:
 
             compress = self.lzwcompress(bits_number=self.kbit, operation="train")
 
-            split_point = round(len(files)*(train_split/100))
-            training_data = files[:split_point]
-            test_data = [os.path.join(path, file) for file in files[split_point:]]
+            split_points = round(len(files)-(len(files)*(train_split/100)))
+            tests_files = random.sample(files, split_points)
+
+            self.test_data.extend([os.path.join(path, file) for file in tests_files])
+            training_data = list(set(files) - set(tests_files))
 
             for file in training_data:
 
@@ -40,19 +44,16 @@ class PatternRecognizer:
 
             self.train_dictionary[dict_cache_name] = compress._dictionary
 
-        for test_file in test_data:
-            self.input_file = test_file
-            self.test()
+        return self.test_data
 
     def test(self):
 
         if not self.train_dictionary:
             self.load_dict_cache()
-
+        
         best_compressed_data_len = sys.maxsize
 
         print("\nTesting files...")
-
 
         for label, bytes_dict in tqdm(self.train_dictionary.items()):
 

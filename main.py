@@ -60,7 +60,7 @@ def lzw_pattern_recognizer_train(input_file, bits_number, train_split, painter):
         print(log)
 
         pattern_recognizer.train(color, train_split)
-    
+
     for file in sorted(pattern_recognizer.test_data):
         pattern_recognizer.input_file = file
         pattern_recognizer.test()
@@ -73,7 +73,7 @@ def lzw_pattern_recognizer_test(input_file, painter):
     pattern_recognizer.test()
 
 
-def process(operation=str, input_file=str, train_split=90, bits_number=None):
+def process(operation=str, input_file=str, train_split=80, bits_number=None):
 
     painter = paint.Paint()
 
