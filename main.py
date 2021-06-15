@@ -66,7 +66,7 @@ def lzw_pattern_recognizer_train(input_file, bits_number, train_split, painter):
         pattern_recognizer.train(color, train_split)
 
         best_compressions = {}
-        print('_'*50)
+        print('_'*152)
         print('Testing files...\n')
         for file in tqdm(sorted(pattern_recognizer.test_data)):
             pattern_recognizer.input_file = file
@@ -77,9 +77,7 @@ def lzw_pattern_recognizer_train(input_file, bits_number, train_split, painter):
     
     Path("results").mkdir(parents=True, exist_ok=True)
     with open('results/best_results.json', 'w') as best_results_json:
-        dump(best_compressions_by_kbit, best_results_json)
-
-    print(best_compressions_by_kbit)
+        dump(best_compressions_by_kbit, best_results_json, indent=2, separators=(',', ': '))
 
 def lzw_pattern_recognizer_test(input_file, painter):
 
