@@ -53,9 +53,9 @@ class PatternRecognizer:
         
         best_compressed_data_len = sys.maxsize
 
-        print("\nTesting files...")
+        #print("\nTesting files...")
 
-        for label, bytes_dict in tqdm(self.train_dictionary.items()):
+        for label, bytes_dict in self.train_dictionary.items():
 
             self.kbit = int(label.split('_')[1])
 
@@ -69,9 +69,11 @@ class PatternRecognizer:
                 best_compression = compressed_data
 
         compress.write_compress_file(best_compression)
-        print(f'\nFile: {self.input_file}')
-        print(f'Best compression len: {len(best_compression)}')
-        print(f'Best settings: {best_settings}')
+        # print(f'\nFile: {self.input_file}')
+        # print(f'Best compression len: {len(best_compression)}')
+        # print(f'Best settings: {best_settings}')
+
+        return best_settings
 
 
     def load_dict_cache(self):

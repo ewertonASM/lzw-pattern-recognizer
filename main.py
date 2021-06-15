@@ -2,6 +2,9 @@ from util import lzwcompress, lzwdecompress
 from util import paint
 from util import reportgenerator
 from util import patternrecognizer
+from tqdm import tqdm
+from json import dump
+from pathlib import Path
 import fire
 
 
@@ -49,6 +52,7 @@ def decompress(bits_number, input_file, painter):
 def lzw_pattern_recognizer_train(input_file, bits_number, train_split, painter):
 
     bits_number_list = [bits_number] if bits_number else list(range(9, 17))
+    best_compressions_by_kbit = {}
 
     for index, kbit in enumerate(bits_number_list):
 
@@ -61,10 +65,21 @@ def lzw_pattern_recognizer_train(input_file, bits_number, train_split, painter):
 
         pattern_recognizer.train(color, train_split)
 
-    for file in sorted(pattern_recognizer.test_data):
-        pattern_recognizer.input_file = file
-        pattern_recognizer.test()
+        best_compressions = {}
+        print('_'*50)
+        print('Testing files...\n')
+        for file in tqdm(sorted(pattern_recognizer.test_data)):
+            pattern_recognizer.input_file = file
+            best_compressions[file] = pattern_recognizer.test()
 
+        best_compressions_by_kbit[f's{kbit}'] = best_compressions
+
+    
+    Path("results").mkdir(parents=True, exist_ok=True)
+    with open('results/best_results.json', 'w') as best_results_json:
+        dump(best_compressions_by_kbit, best_results_json)
+
+    print(best_compressions_by_kbit)
 
 def lzw_pattern_recognizer_test(input_file, painter):
 
@@ -73,7 +88,7 @@ def lzw_pattern_recognizer_test(input_file, painter):
     pattern_recognizer.test()
 
 
-def process(operation=str, input_file=str, train_split=80, bits_number=None):
+def process(operation=str, input_file=str, train_split=90, bits_number=None):
 
     painter = paint.Paint()
 
