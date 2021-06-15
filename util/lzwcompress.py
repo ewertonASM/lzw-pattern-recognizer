@@ -23,7 +23,7 @@ class LzwCompress():
 
         try:
             with open(self._file_dir, 'r', encoding='latin-1') as f:
-                data = f.read()
+                data = f.read()[14:] if self.operation == "train" else f.read()
             return data
 
         except:
