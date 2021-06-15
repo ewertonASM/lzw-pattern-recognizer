@@ -1,54 +1,47 @@
 import matplotlib.pyplot as plt
+import matplotlib.ticker as mtick
+from pathlib import Path
+from itertools import zip_longest
 from os import stat
 import re
 
 class Report_Generator:
 
-    def __init__(self, compression_times, num_of_indexes, input_file, compressed_sizes, num_bits):
+    def __init__(self, accuracies_dict, times_dict):
 
-        self._compression_times = compression_times
-        self._num_of_indexes = num_of_indexes
-        self._input_file = input_file
-        self._compressed_sizes = compressed_sizes
-        self._num_bits = num_bits
-        
-        rc = self.calculate_size()
-        self.graph_generator(rc)
-
-
-    def calculate_size(self):
-
-        input_size = stat(self._input_file).st_size
-        
-        compression_ratios = []
-
-        for output_size in self._compressed_sizes:
-            compression_ratios.append((input_size*8)/(output_size*self._num_bits)) 
-
-        return compression_ratios
+        self._accuracies_dict = accuracies_dict
+        self._times_dict = times_dict
+        self.graph_generator()
         
 
-    def graph_generator(self, compression_ratios):
+    def graph_generator(self):
         
-        kbits = [i for i in range(9, 17)]
-        
-        input_name = re.search(r'[^/]+(?=\.)', self._input_file).group(0)
+        kbits = []
+        accuracy_rates = []
+        times = []
+        persons = []
+        for (person, accuracy), (kbit, time) in zip_longest(self._accuracies_dict.items(), self._times_dict.items()):
+            kbits.append(kbit)
+            accuracy_rates.append(accuracy*100)
+            times.append(time)
+            persons.append(person)
 
         _fig0, ax0 = plt.subplots(nrows=1, ncols=1)
-
-        ax0.set_title('Compression ratios by K-bits')
-        ax0.set(xlabel='K-bits', ylabel='Compression Ratios', title='Compression Ratios by K-bits')
-        ax0.plot(kbits, compression_ratios)
-        plt.savefig(f'./results/graphs/graph_RC({input_name}).png')
+        ax0.set_title('Accuracy rates by kbit')
+        ax0.set(xlabel='K-bits', ylabel='Accuracy', title='Accuracy rates by kbit')
+        ax0.plot(kbits, accuracy_rates)
+        ax0.yaxis.set_major_formatter(mtick.PercentFormatter())
+        Path("results/graphs").mkdir(parents=True, exist_ok=True)
+        plt.savefig(f'./results/graphs/accuracies.png')
 
         _fig1, ax1 = plt.subplots(nrows=1, ncols=1)
-        ax1.set_title('Compression times by K-bits')
-        ax1.set(xlabel='K-bits', ylabel='Compression Times', title='Compression Times by K-bits')
-        ax1.plot(kbits, self._compression_times)
-        plt.savefig(f'./results/graphs/graph_Compression_time({input_name}).png')
+        ax1.set_title('Processing time by K-bits')
+        ax1.set(xlabel='K-bits', ylabel='Processing Time (s)', title='Processing time by K-bits')
+        ax1.plot(kbits, times)
+        plt.savefig(f'./results/graphs/times.png')
 
-        _fig2, ax2 = plt.subplots(nrows=1, ncols=1)
-        ax2.set_title('Number of indexes by K-bits')
-        ax2.set(xlabel='K-bits', ylabel='Number of indexes', title='Num. of indexes by K-bits')
-        ax2.plot(kbits, self._num_of_indexes)
-        plt.savefig(f'./results/graphs/graph_indexes({input_name}).png')
+        # _fig2, ax2 = plt.subplots(nrows=1, ncols=1)
+        # ax2.set_title('Number of indexes by K-bits')
+        # ax2.set(xlabel='K-bits', ylabel='Number of indexes', title='Num. of indexes by K-bits')
+        # ax2.plot(kbits, self._num_of_indexes)
+        # plt.savefig(f'./results/graphs/graph_indexes({input_name}).png')

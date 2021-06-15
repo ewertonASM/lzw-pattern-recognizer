@@ -1,5 +1,6 @@
 from util import lzwcompress, lzwdecompress
 from util import paint
+import time
 from util import reportgenerator
 from util import patternrecognizer
 from tqdm import tqdm
@@ -55,9 +56,10 @@ def lzw_pattern_recognizer_train(input_file, bits_number, train_split, painter):
     bits_number_list = [bits_number] if bits_number else list(range(9, 17))
     best_compressions_by_kbit = {}
     accuracy_rates = {}
+    times_by_kbit = {}
 
     for index, kbit in enumerate(bits_number_list):
-
+        start_time_kbit = time.time()
         pattern_recognizer = patternrecognizer.PatternRecognizer(
             input_file, kbit)
 
@@ -87,6 +89,10 @@ def lzw_pattern_recognizer_train(input_file, bits_number, train_split, painter):
             if person_img == person_dict:
                 sum_of_correct_imgs += 1
         
+        end_time_kbit = time.time()
+
+        times_by_kbit[kbit] = end_time_kbit - start_time_kbit
+
         accuracy_rates[f's{kbit}'] = sum_of_correct_imgs/40.0
     
     Path("results").mkdir(parents=True, exist_ok=True)
@@ -94,6 +100,8 @@ def lzw_pattern_recognizer_train(input_file, bits_number, train_split, painter):
         dump(best_compressions_by_kbit, best_results_json, indent=2, separators=(',', ': '))
     with open('results/accuracies.json', 'w') as accuracy_json:
         dump(accuracy_rates, accuracy_json, indent=2, separators=(',', ': '))
+
+    report = reportgenerator.Report_Generator(accuracy_rates, times_by_kbit)
 
 def lzw_pattern_recognizer_test(input_file, painter):
 
