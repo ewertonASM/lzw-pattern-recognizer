@@ -5,6 +5,7 @@ from util import patternrecognizer
 from tqdm import tqdm
 from json import dump
 from pathlib import Path
+import re
 import fire
 
 
@@ -53,6 +54,7 @@ def lzw_pattern_recognizer_train(input_file, bits_number, train_split, painter):
 
     bits_number_list = [bits_number] if bits_number else list(range(9, 17))
     best_compressions_by_kbit = {}
+    accuracy_rates = {}
 
     for index, kbit in enumerate(bits_number_list):
 
@@ -68,16 +70,30 @@ def lzw_pattern_recognizer_train(input_file, bits_number, train_split, painter):
         best_compressions = {}
         print('_'*152)
         print('Testing files...\n')
+
         for file in tqdm(sorted(pattern_recognizer.test_data)):
             pattern_recognizer.input_file = file
-            best_compressions[file] = pattern_recognizer.test()
+            person_img = re.findall(r's[0-9]+\/[0-9]+', file)
+            correct_img = re.sub('/', '_', person_img[0])
+            best_compressions[correct_img] = pattern_recognizer.test()
 
         best_compressions_by_kbit[f's{kbit}'] = best_compressions
-
+        
+        sum_of_correct_imgs = 0
+        for img, best_img in best_compressions_by_kbit[f's{kbit}'].items():
+            person_img = re.split(r'_[0-9]+', img)[0]
+            person_dict = re.split(r'_[0-9][0-9]', best_img)[0]
+            
+            if person_img == person_dict:
+                sum_of_correct_imgs += 1
+        
+        accuracy_rates[f's{kbit}'] = sum_of_correct_imgs/40.0
     
     Path("results").mkdir(parents=True, exist_ok=True)
     with open('results/best_results.json', 'w') as best_results_json:
         dump(best_compressions_by_kbit, best_results_json, indent=2, separators=(',', ': '))
+    with open('results/accuracies.json', 'w') as accuracy_json:
+        dump(accuracy_rates, accuracy_json, indent=2, separators=(',', ': '))
 
 def lzw_pattern_recognizer_test(input_file, painter):
 

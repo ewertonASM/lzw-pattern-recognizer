@@ -67,6 +67,7 @@ class PatternRecognizer:
             if len(compressed_data) < best_compressed_data_len:
                 best_settings = label
                 best_compression = compressed_data
+                best_compressed_data_len = len(best_compression)
 
         compress.write_compress_file(best_compression)
         # print(f'\nFile: {self.input_file}')
