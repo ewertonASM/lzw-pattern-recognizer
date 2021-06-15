@@ -77,10 +77,10 @@ def lzw_pattern_recognizer_train(input_file, bits_number, train_split, painter):
             correct_img = re.sub('/', '_', person_img[0])
             best_compressions[correct_img] = pattern_recognizer.test()
 
-        best_compressions_by_kbit[f's{kbit}'] = best_compressions
+        best_compressions_by_kbit[f'{kbit} kbits'] = best_compressions
         
         sum_of_correct_imgs = 0
-        for img, best_img in best_compressions_by_kbit[f's{kbit}'].items():
+        for img, best_img in best_compressions_by_kbit[f'{kbit} kbits'].items():
             person_img = re.split(r'_[0-9]+', img)[0]
             person_dict = re.split(r'_[0-9][0-9]', best_img)[0]
             
