@@ -9,12 +9,13 @@ encoding = 'latin-1'
 
 class LzwCompress():
 
-    def __init__(self, file_dir=None, bits_number=int, dict_cache=None):
+    def __init__(self, file_dir=None, bits_number=int, dict_cache=None, operation=None):
 
         self._file_dir = file_dir
         self._table_edge = pow(2, bits_number)
         self.bytes_dictionary_size = 256
         self.dict_cache = dict_cache
+        self.operation = operation
         self._dictionary = dict_cache if dict_cache else {i.to_bytes(1, 'big'): i for i in range(
             self.bytes_dictionary_size)}
 
@@ -22,7 +23,7 @@ class LzwCompress():
 
         try:
             with open(self._file_dir, 'r', encoding='latin-1') as f:
-                data = f.read()
+                data = f.read()[14:] if self.operation == "train" else f.read()
             return data
 
         except:
@@ -57,6 +58,7 @@ class LzwCompress():
             if symbol.encode(encoding) in self._dictionary:
                 string = symbol
             else:
+                # if(string):
                 encoded_chr = string.encode(encoding)
                 compressed_data.append(self._dictionary[encoded_chr])
 
@@ -75,7 +77,7 @@ class LzwCompress():
 
         # print(f'Elapsed time is {end - start}s')
 
-        # if self.dict_cache:
-        #     self.write_compress_file(compressed_data)
+        if self.operation != "train":
+            self.write_compress_file(compressed_data)
 
         return compress_time, len(compressed_data), len(compressed_data), compressed_data
